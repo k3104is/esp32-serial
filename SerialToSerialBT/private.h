@@ -25,16 +25,10 @@
     #define LOCAL_IP  "192.168.137.131"
 #endif
 
-#ifdef _REFACT_
 typedef struct T_COM_STS{
     const struct T_COM_STS *(*const vdRcv)(const struct T_COM_STS *ptr_this);
     const struct T_COM_STS *(*const vdSnd)(const struct T_COM_STS *ptr_this2);
 }T_COM_STS;
-#endif
-enum{
-  eNONE = 0,
-  eRECEIVING,
-  eSENDING,
-};
+
 
 #endif

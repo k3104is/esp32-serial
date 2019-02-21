@@ -10,35 +10,37 @@
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
-BluetoothSerial SerialBT;
-
-
-
-#ifdef _REFACT_
-void initialize(void);
+/* プロトタイプ宣言 */
+void BT_WrtByChar(const char *str);
+void bt_vdRcvStr(void);
+void bt_vdSndStr(void);
+void vdOnInit(void);
 void onRcv(void);
 void onSnd(void);
-
-static const T_COM_STS *ptr_com_sts;
-
 static const T_COM_STS *bt_ignore(const T_COM_STS *ptr_this);
+static const T_COM_STS *bt_rcving(const T_COM_STS *ptr_this);
 static const T_COM_STS *bt_st_rcv(const T_COM_STS *ptr_this);
+static const T_COM_STS *bt_snding(const T_COM_STS *ptr_this);
 static const T_COM_STS *bt_st_snd(const T_COM_STS *ptr_this);
 
+/* インスタンス */
+BluetoothSerial SerialBT;
+static const T_COM_STS *ptr_com_sts;
 const T_COM_STS c_t_com_sts_idle = {    /* アイドル状態 */
   bt_st_rcv,  /* 受信開始 → 受信状態 */
   bt_st_snd   /* 送信開始 → 送信状態 */
 };
-const T_COM_STS c_t_com_sts_rcving = {  /* 受信状態 */
-  bt_ignore,  /* 受信開始 → 無視 */
+const T_COM_STS c_t_com_sts_rcv = {     /* 受信状態 */
+  bt_rcving,  /* 受信中   → 受信状態 */
   bt_st_snd   /* 送信開始 → 送信状態 */
 };
-
-const T_COM_STS c_t_com_sts_snding = {  /* 送信状態 */
+const T_COM_STS c_t_com_sts_snd = {     /* 送信状態 */
   bt_st_rcv,  /* 受信開始 → 受信状態 */
-  bt_ignore   /* 送信開始 → 無視 */
+  bt_snding   /* 送信中   → 送信状態 */
 };
-void initialize(void){
+
+/* ソース */
+void vdOnInit(void){
   ptr_com_sts = &c_t_com_sts_idle;
 };
 void vdOnRcv(void){
@@ -47,44 +49,62 @@ void vdOnRcv(void){
 void vdOnSnd(void){
   ptr_com_sts = ptr_com_sts->vdSnd(ptr_com_sts);
 };
-#endif
 
-
-void setup() {
-  Serial.begin(115200);
-  SerialBT.begin("ESP32test"); //Bluetooth device name
-  Serial.println("The device started, now you can pair it with bluetooth!");
+static const T_COM_STS *bt_ignore(const T_COM_STS *ptr_this){
+  return &c_t_com_sts_idle;
+};
+static const T_COM_STS *bt_rcving(const T_COM_STS *ptr_this){
+  bt_vdRcvStr();
+  return &c_t_com_sts_rcv;
+};
+static const T_COM_STS *bt_st_rcv(const T_COM_STS *ptr_this){
+  BT_WrtByChar(MSG_OF_RCV);
+  bt_vdRcvStr();
+  return &c_t_com_sts_rcv;
+};
+static const T_COM_STS *bt_snding(const T_COM_STS *ptr_this){
+  bt_vdSndStr();
+  return &c_t_com_sts_snd;
+}
+static const T_COM_STS *bt_st_snd(const T_COM_STS *ptr_this){
+  BT_WrtByChar(MSG_OF_SND);
+  bt_vdSndStr();
+  return &c_t_com_sts_snd;
 }
 
-void BT_WrtByChar(const char *str)
-{
+void BT_WrtByChar(const char *str){
   while('\0' != *str){
     SerialBT.write(*str++);
   }
 }
 
+void bt_vdRcvStr(void){
+  char str = Serial.read();
+  SerialBT.write(str);
+  Serial.write(str);
+};
+void bt_vdSndStr(void){
+  char str = SerialBT.read();
+  SerialBT.write(str);
+  Serial.write(str);
+};
+
+/* Arduinoフォーマット */
+void setup() {
+  vdOnInit();
+  Serial.begin(115200);
+  SerialBT.begin("ESP32test"); //Bluetooth device name
+  Serial.println("The device started, now you can pair it with bluetooth!");
+}
+
 void loop() {
-  static unsigned char com_sts = eNONE;
-  char str = 0;
   /* 受信 */
   if (Serial.available()) {
-    if(eRECEIVING != com_sts){
-      com_sts = eRECEIVING;
-      BT_WrtByChar(MSG_OF_RCV);
-    }
-    str = Serial.read();
-    SerialBT.write(str);
-    Serial.write(str);
+    vdOnRcv();
   }
   /* 送信 */
   if (SerialBT.available()) {
-    if(eSENDING != com_sts){
-      com_sts = eSENDING;
-      BT_WrtByChar(MSG_OF_SND);
-    }
-    str = SerialBT.read();
-    SerialBT.write(str);
-    Serial.write(str);
+    vdOnSnd();
   }
   delay(20);
 }
