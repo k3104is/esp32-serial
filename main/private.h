@@ -6,13 +6,13 @@
 
 
 #define P13         13
-#define BAUD_RATE   115200
+#define BR_SERIAL   115200
+#define BR_UART     115200
 #define PORT_NUM    21
 #define HTML_PATH "/index.html"
 #define BUFFER_SIZE 16384
 #define MSG_OF_RCV "\r\n[Received Data]\r\n"
 #define MSG_OF_SND "\r\n[Send data]\r\n"
-
 /* 社外 */
 #ifndef _IN_THE_FIRM_
     #define SSID      "SPWH_H32_E57283"
@@ -30,5 +30,7 @@ typedef struct T_COM_STS{
     const struct T_COM_STS *(*const vdSnd)(const struct T_COM_STS *ptr_this2);
 }T_COM_STS;
 
+void BT_vdSetup(void);
+void BT_vdLoop(void);
 
 #endif
