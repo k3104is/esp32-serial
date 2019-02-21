@@ -25,6 +25,8 @@ static const T_COM_STS *bt_st_snd(const T_COM_STS *ptr_this);
 
 /* インスタンス */
 BluetoothSerial SerialBT;
+HardwareSerial  Uart2(2); // Uart2(TXD:IO17, RXD:IO16)
+
 static const T_COM_STS *ptr_com_sts;
 const T_COM_STS c_t_com_sts_idle = {    /* アイドル状態 */
   bt_st_rcv,  /* 受信開始 → 受信状態 */
@@ -79,27 +81,30 @@ void BT_WrtByChar(const char *str){
 }
 
 void bt_vdRcvStr(void){
-  char str = Serial.read();
+  char str = Uart2.read();
   SerialBT.write(str);
   Serial.write(str);
+  Uart2.write(str);
 };
 void bt_vdSndStr(void){
   char str = SerialBT.read();
   SerialBT.write(str);
   Serial.write(str);
+  Uart2.write(str);
 };
 
 /* Arduinoフォーマット */
 void setup() {
   vdOnInit();
   Serial.begin(115200);
+  Uart2.begin(115200);
   SerialBT.begin("ESP32test"); //Bluetooth device name
   Serial.println("The device started, now you can pair it with bluetooth!");
 }
 
 void loop() {
   /* 受信 */
-  if (Serial.available()) {
+  if (Uart2.available()) {
     vdOnRcv();
   }
   /* 送信 */
