@@ -39,6 +39,7 @@ typedef struct T_COM_STS{
 }T_COM_STS;
 
 typedef struct T_TIM{
+    bool           b_10ms;
     bool           b_1s;
     bool           flg;
     unsigned short st_time;

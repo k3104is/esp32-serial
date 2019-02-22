@@ -12,18 +12,32 @@ static void tim_vdIncOfSec(void){
 bool TIM_vd1s(void){
   return s_t_tim.b_1s;
 }
+
 static void tim_vdIntervalTimer500ms(void){
   s_t_tim.b_1s = !s_t_tim.b_1s; /* 500[ms]周期に反転 */
   if(s_t_tim.b_1s)  /* 1s周期 */
     tim_vdIncOfSec();
   return;
 }
+static void tim_vdIntervalTimer10us(void){
+  return;
+}
+
+
 void tim_vdInitTimer0(void)
 {
   timer0 = timerBegin(0, 240, true);  /* タイマ設定 240分周→1[us] */
   timerAttachInterrupt(timer0, tim_vdIntervalTimer500ms, true);  /* 割込関数セット */
   timerAlarmWrite(timer0, 500000, true);  /* 割込タイミング 500000カウントで発火→500[ms] */
   timerAlarmEnable(timer0); /* タイマ開始 */
+  return;
+}
+void tim_vdInitTimer1(void)
+{
+  timer1 = timerBegin(0, 24, true);  /* タイマ設定 240分周→100[ns] */
+  timerAttachInterrupt(timer1, tim_vdIntervalTimer10us, true);  /* 割込関数セット */
+  timerAlarmWrite(timer1, 100, true);  /* 割込タイミング 100カウントで発火→10[us] */
+  timerAlarmEnable(timer1); /* タイマ開始 */
   return;
 }
 
