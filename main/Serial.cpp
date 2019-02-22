@@ -47,6 +47,8 @@ static const T_COM_STS c_t_com_sts_bcc = {     /* BCC受信状態 */
 
 /* ソース */
 static void bt_vdOnInit(void){
+  bt_WrtByChar("\r\nInitialized_bt\r\n"); //Bluetooth device name
+  Serial.println("\r\nInitialized_se\r\n");
   Uart2.end();
   ptr_com_sts = &c_t_com_sts_idle;
 };
@@ -198,8 +200,10 @@ void BT_vdMain(void){
     TIM_vdSt();
   }
   /* タイムアウト判定 */
-  if(bt_bTimeout(COM_TIMEOUT))
+  if(bt_bTimeout(COM_TIMEOUT)){
     bt_vdOnInit();
+    TIM_vdSp();
+  }
   delay(20);
   return;
 }

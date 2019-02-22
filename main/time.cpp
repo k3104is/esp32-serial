@@ -2,6 +2,7 @@
 
 static T_TIM s_t_tim;
 hw_timer_t * timer0 = NULL;
+hw_timer_t * timer1 = NULL;
 
 static void tim_vdIncOfSec(void){
   if(s_t_tim.flg)
