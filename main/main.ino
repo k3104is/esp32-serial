@@ -1,9 +1,12 @@
 #include "private.h"
 
 void setup() {
-  BT_vdSetup();
+  TIM_vdInit();
+  LED_vdInit();
+  BT_vdInit();
 }
 
 void loop() {
-  BT_vdLoop();
+  LED_vdMain();
+  BT_vdMain();
 }
