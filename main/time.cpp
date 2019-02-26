@@ -47,7 +47,7 @@ bool TIM_vRtnFlgOf1ms(void)
 
 void tim_vdInitTimer0(void)
 {
-    timer0 = timerBegin(0, 240, true);    /* タイマ設定 240分周→1[us] */
+    timer0 = timerBegin(0, 80, true);    /* タイマ設定 240分周→1[us] */
     timerAttachInterrupt(timer0, tim_vdIntervalTimer500ms, true);    /* 割込関数セット */
     timerAlarmWrite(timer0, 500000, true);    /* 割込タイミング 500000カウントで発火→500[ms] */
     timerAlarmEnable(timer0); /* タイマ開始 */
@@ -55,7 +55,7 @@ void tim_vdInitTimer0(void)
 }
 void tim_vdInitTimer1(void)
 {
-    timer1 = timerBegin(1, 240, true);    /* タイマ設定 240分周→1[us] */
+    timer1 = timerBegin(1, 80, true);    /* タイマ設定 240分周→1[us] */
     timerAttachInterrupt(timer1, tim_vdIntervalTimer1ms, true);    /* 割込関数セット */
     timerAlarmWrite(timer1, 1000, true);    /* 割込タイミング 1000カウントで発火→1[ms] */
     timerAlarmEnable(timer1); /* タイマ開始 */

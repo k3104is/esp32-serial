@@ -17,18 +17,12 @@ U8X8_SSD1306_128X64_NONAME_4W_SW_SPI u8x8(
     c_s_s1_oled_dc,     /* dc */ 
     c_s_s1_oled_rst);   /* reset */
 
-static void oled_vdReqProcess(bool b_req)
-{
-    return;
-}
-
 void OLED_vdInit(void)
 {
     u8x8.begin();
     u8x8.setFont(u8x8_font_chroma48medium8_r);
     return;
 }
-
 
 void OLED_vdSwReqMain(bool b_sw)
 {
